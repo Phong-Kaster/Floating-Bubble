@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Floating Bubble</string>
+    <string name="skip">Skip</string>
+    <string name="floating_icon">Floating icon</string>
+    <string name="quick_record_control">Quick record control</string>
+    <string name="rapid_screen_capture">Rapid screen capture</string>
+    <string name="explore_brush_and_facecam_options">Explore brush and facecam options</string>
+    <string name="enhance_recording_stability">Enhance recording stability</string>
+    <string name="grant_permission_to_enable">Grant permission to enable the floating icon for a better user experience below.</string>
+    <string name="enable">Enable</string>
+</resources>
