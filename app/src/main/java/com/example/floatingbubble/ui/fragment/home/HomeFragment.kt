@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.floatingbubble.R
 import com.example.floatingbubble.lifecycleobserver.NotificationLifecycleObserver
-import com.example.floatingbubble.service.FloatingBubbleService
+import com.example.floatingbubble.service.MyFloatingBubbleService
 import com.example.floatingbubble.ui.theme.ColorBackground
 import com.example.floatingbubble.ui.theme.customizedTextStyle
 import com.example.floatingbubble.util.ServiceUtil.startBubbleService
@@ -93,7 +92,7 @@ class HomeFragment : CoreFragment() {
             },
             onDisable = {
                 showToast("Disable")
-                val intent = Intent(requireActivity(), FloatingBubbleService::class.java)
+                val intent = Intent(requireActivity(), MyFloatingBubbleService::class.java)
                 requireActivity().stopService(intent)
             }
         )

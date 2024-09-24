@@ -32,7 +32,7 @@ class NotificationHelper @JvmOverloads constructor(
      * create notification channel on android 8 and above
      * */
     fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= AndroidVersions.`8`) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(channelId, channelName)
         }
     }
@@ -46,7 +46,7 @@ class NotificationHelper @JvmOverloads constructor(
         NotificationCompat.Builder(context, channelId)
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_rounded_blue_diamond)
-            .setContentTitle("bubble is running")
+            .setContentTitle(context.getString(R.string.floating_bubble_is_running))
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setCategory(Notification.CATEGORY_SERVICE)
             .setSilent(true)

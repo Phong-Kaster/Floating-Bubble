@@ -15,10 +15,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
 import com.example.floatingbubble.R
-import com.example.floatingbubble.ui.activity.MainActivity
 
 
-class FloatingBubbleService : Service() {
+class MyFloatingBubbleService : Service() {
 
     private val windowManager by lazy { getSystemService(Context.WINDOW_SERVICE) as WindowManager }
     private val TAG = this.javaClass.simpleName
