@@ -1,5 +1,10 @@
 package com.example.floatingbubble.ui.fragment.onboard
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.Settings
+import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,21 +33,64 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.floatingbubble.R
+import com.example.floatingbubble.lifecycleobserver.OverlayPermissionLifecycleObserver
 import com.example.floatingbubble.ui.fragment.onboard.component.FloatingIcon
 import com.example.floatingbubble.ui.theme.ColorPrimary
-import com.example.floatingbubble.ui.theme.ColorTextPrimary
 import com.example.floatingbubble.ui.theme.customizedTextStyle
 import com.example.jetpack.core.CoreFragment
 import com.example.jetpack.core.CoreLayout
+import com.example.jetpack.util.NavigationUtil.safeNavigate
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class OnboardPermissionFragment : CoreFragment() {
 
+    private lateinit var overlayLifecycleObserver: OverlayPermissionLifecycleObserver
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        gotoNextScreenIfPermissionGranted()
+        setupOverlayLauncher()
+    }
+
+    private fun gotoNextScreenIfPermissionGranted() {
+        if (Settings.canDrawOverlays(activity)) {
+            safeNavigate(destination = R.id.toHome)
+            return
+        }
+    }
+
+    /*************************************************
+     * setupOverlayLauncher
+     */
+    private val callback = object : OverlayPermissionLifecycleObserver.Callback {
+        override fun gotoNextScreen() {
+            safeNavigate(destination = R.id.toHome)
+        }
+    }
+
+    private fun setupOverlayLauncher() {
+        overlayLifecycleObserver = OverlayPermissionLifecycleObserver(
+            activity = requireActivity(),
+            registry = requireActivity().activityResultRegistry,
+            callback = callback
+        )
+        lifecycle.addObserver(overlayLifecycleObserver)
+    }
+
+
     @Composable
     override fun ComposeView() {
         super.ComposeView()
-        OnboardPermissionLayout()
+        OnboardPermissionLayout(
+            onSkip = {
+                safeNavigate(destination = R.id.toHome)
+            },
+            onEnable = {
+                overlayLifecycleObserver.requestOverlayPermission()
+            }
+        )
     }
 }
 

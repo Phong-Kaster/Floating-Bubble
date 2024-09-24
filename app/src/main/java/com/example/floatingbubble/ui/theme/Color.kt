@@ -24,5 +24,5 @@ val ColorTextOrange = Color(0xFFFF7E62)
 val ColorTextHelp = Color(0xFF8A8A8A)
 
 val ColorPrimary = Color(0xFFFF7E62)
-val ColorBackground = Color(0xFFFEFEFE)
+val ColorBackground = Color(0xFF2C3141)
 val ColorIcon = Color(0xFF545454)

@@ -8,6 +8,9 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- NOTIFICATION -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /><!-- Android 13 or higher -->
+
     <application
         android:name=".FloatingBubbleApplication"
         android:allowBackup="false"
@@ -30,6 +33,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <service
+            android:name=".service.FloatingBubbleService"
+            android:exported="true"
+            android:foregroundServiceType="specialUse" />
+
     </application>
 
 </manifest>

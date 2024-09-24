@@ -8,4 +8,9 @@
     <string name="enhance_recording_stability">Enhance recording stability</string>
     <string name="grant_permission_to_enable">Grant permission to enable the floating icon for a better user experience below.</string>
     <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="fake_title">Lorem Ipsum</string>
+    <string name="fake_message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</string>
 </resources>

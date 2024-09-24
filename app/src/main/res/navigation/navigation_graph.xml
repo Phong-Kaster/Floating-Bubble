@@ -2,11 +2,21 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/onboardPermissionFragment">
 
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.floatingbubble.ui.fragment.home.HomeFragment"/>
+        android:name="com.example.floatingbubble.ui.fragment.home.HomeFragment" />
+
+    <fragment
+        android:id="@+id/onboardPermissionFragment"
+        android:name="com.example.floatingbubble.ui.fragment.onboard.OnboardPermissionFragment" />
+
+    <action
+        android:id="@+id/toHome"
+        app:destination="@id/homeFragment"
+        app:popUpTo="@id/onboardPermissionFragment"
+        app:popUpToInclusive="true" />
 
 </navigation>
