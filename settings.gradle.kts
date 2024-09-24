@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Floating Bubble"
 include(":app")
+include(":screenez")
+include(":floatingbubble")

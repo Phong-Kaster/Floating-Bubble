@@ -5,6 +5,7 @@ plugins {
 
     /* Dependency injection with Hilt  - https://developer.android.com/training/dependency-injection/hilt-android#setup*/
     id("com.google.dagger.hilt.android") version "2.52" apply false
+    alias(libs.plugins.android.library) apply false
 }
 
 buildscript {
