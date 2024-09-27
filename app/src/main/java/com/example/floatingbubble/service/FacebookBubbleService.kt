@@ -6,9 +6,7 @@ import android.graphics.Point
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
-import android.view.accessibility.AccessibilityEvent
 import androidx.core.view.KeyEventDispatcher
-import androidx.core.view.KeyEventDispatcher.dispatchKeyEvent
 import com.example.floatingbubble.FloatingBubbleCallback
 import com.example.floatingbubble.FloatingBubbleService
 import com.example.floatingbubble.R
@@ -27,7 +25,7 @@ class FacebookBubbleService : FloatingBubbleService() {
 
     @SuppressLint("RestrictedApi")
     override fun setupMiniBubble(): BubbleBuilder? {
-        val imgView = ViewHelper.fromDrawable(this, R.drawable.ic_disclaimer, 60, 60)
+        val imgView = ViewHelper.fromDrawable(this, R.drawable.ic_disclaimer, 40, 40)
         imgView.setOnClickListener {
             KeyEventDispatcher.dispatchBeforeHierarchy(
                 imgView,

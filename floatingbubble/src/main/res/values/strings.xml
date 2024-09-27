@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="floating_bubble_is_running">Floating Bubble is running</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
 </resources>
