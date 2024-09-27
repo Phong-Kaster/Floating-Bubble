@@ -87,11 +87,9 @@ class HomeFragment : CoreFragment() {
         super.ComposeView()
         HomeLayout(
             onEnable = {
-                showToast("Enable")
                 requireActivity().startBubbleService()
             },
             onDisable = {
-                showToast("Disable")
                 val intent = Intent(requireActivity(), MyFloatingBubbleService::class.java)
                 requireActivity().stopService(intent)
             }
@@ -106,7 +104,8 @@ fun HomeLayout(
 ) {
     CoreLayout(
         backgroundColor = ColorBackground,
-        bottomBar = {
+        bottomBar = { },
+        content = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier
@@ -144,17 +143,6 @@ fun HomeLayout(
                         .background(color = Color.Cyan)
                         .padding(horizontal = 16.dp, vertical = 16.dp),
                 )
-            }
-        },
-        content = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(
-                    space = 10.dp,
-                    alignment = Alignment.CenterVertically
-                ),
-                modifier = Modifier.fillMaxSize()
-            ) {
-
             }
         }
     )

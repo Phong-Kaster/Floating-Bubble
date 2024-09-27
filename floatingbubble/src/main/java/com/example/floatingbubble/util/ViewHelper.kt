@@ -9,7 +9,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 
 
-object ViewHelper {
+internal object ViewHelper {
 
     //region load bubble
     @JvmStatic

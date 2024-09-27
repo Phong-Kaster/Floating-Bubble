@@ -1,46 +1,40 @@
 package com.example.floatingbubble.service
 
-import android.app.Service
-import android.content.Intent
-import android.os.IBinder
-import com.example.floatingbubble.util.NotificationHelper
-import com.example.floatingbubble.util.canDrawOverlays
-import com.example.floatingbubble.util.sez
+import android.content.res.Configuration
+import com.example.floatingbubble.enums.BubbleState
+import com.example.floatingbubble.model.FloatingBubble
 
-abstract class FloatingBubbleService : Service() {
+class FloatingBubbleService : BubbleService() {
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    /** the current state of floating bubble*/
+    private var state = BubbleState.NONE
 
+    var miniBubble: FloatingBubble? = null
 
-    override fun onCreate() {
-        super.onCreate()
-        checkIfApplicationCanDrawOverlay()
-        createScreenEasy()
-        startForegroundService()
-        setupBubble()
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
     }
 
-    override fun onDestroy() {
-        removeAllBubble()
-        super.onDestroy()
+    /**
+     * get ready for users configuration
+     */
+    override fun setupBubble() {
+
     }
 
-    abstract fun setupBubble()
-    abstract fun removeAllBubble()
-
-    private fun checkIfApplicationCanDrawOverlay() {
-        if (this.canDrawOverlays().not()) {
-            throw SecurityException("Permission Denied: \"display over other app\" permission IS NOT granted!")
-        }
+    /**
+     * remove & destroy bubble is drawing overlay screens & service is running
+     */
+    override fun removeAllBubble() {
+        state = BubbleState.NONE
     }
 
-    private fun startForegroundService() {
-        val notification = NotificationHelper(context = this)
-        notification.createNotificationChannel()
-        startForeground(notification.notificationId, notification.defaultNotification())
+    fun expand() {
+        state = BubbleState.EXPANDED_BUBBLE
     }
 
-    private fun createScreenEasy() {
-        sez.with(this.applicationContext)
+    fun minimize() {
+        state = BubbleState.MINI_BUBBLE
     }
 }
