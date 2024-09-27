@@ -10,6 +10,8 @@
 
     <!-- NOTIFICATION -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /><!-- Android 13 or higher -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:name=".FloatingBubbleApplication"
@@ -37,6 +39,11 @@
 
         <service
             android:name=".service.MyFloatingBubbleService"
+            android:exported="true"
+            android:foregroundServiceType="specialUse" />
+
+        <service
+            android:name=".service.FacebookBubbleService"
             android:exported="true"
             android:foregroundServiceType="specialUse" />
 

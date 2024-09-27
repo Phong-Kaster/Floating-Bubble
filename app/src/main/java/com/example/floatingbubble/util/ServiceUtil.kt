@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import com.example.floatingbubble.service.FacebookBubbleService
 import com.example.floatingbubble.service.MyFloatingBubbleService
 
 object ServiceUtil {
@@ -23,8 +24,8 @@ object ServiceUtil {
 
 
     fun Activity.startBubbleService() {
-        if (!isServiceRunning(MyFloatingBubbleService::class.java) && Settings.canDrawOverlays(this)) {
-            val intent = Intent(this, MyFloatingBubbleService::class.java)
+        if (!isServiceRunning(FacebookBubbleService::class.java) && Settings.canDrawOverlays(this)) {
+            val intent = Intent(this, FacebookBubbleService::class.java)
             application.startService(intent)
         }
     }

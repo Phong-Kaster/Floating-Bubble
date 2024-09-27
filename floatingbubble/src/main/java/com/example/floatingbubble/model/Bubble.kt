@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import com.example.floatingbubble.lifecycleowner.ComposeLifecycleOwner
+import com.example.floatingbubble.ui.ComposeLifecycleOwner
 
 open class Bubble
 constructor(
@@ -18,15 +18,16 @@ constructor(
 
     /* Window Manager */
     private var _windowManager: WindowManager? = null
-    val windowManager: WindowManager
+    private val windowManager: WindowManager
         get() = _windowManager!!
 
+
     /* Params */
-    private var _rootParams: WindowManager.LayoutParams? = null
+    private var _layoutParams: WindowManager.LayoutParams
     var layoutParams
-        get() = _rootParams
+        get() = _layoutParams
         set(value) {
-            _rootParams = value
+            _layoutParams = value
         }
 
     /*  Root View */
@@ -36,7 +37,8 @@ constructor(
         set(value) {
             _root = value
         }
-    val rootGroup get() = root as ViewGroup
+    val rootGroup: ViewGroup
+        get() = root as ViewGroup
 
     /* Compose-based UI*/
     private var composeOwner: ComposeLifecycleOwner? = null
@@ -44,7 +46,7 @@ constructor(
 
     init {
         _windowManager = context.getSystemService(Service.WINDOW_SERVICE) as WindowManager
-        _rootParams = WindowManager.LayoutParams()
+        _layoutParams = WindowManager.LayoutParams()
         _root = root
 
         if (containCompose) {
@@ -63,11 +65,11 @@ constructor(
                     isComposeOwnerInitialized = true
 
                 }
-                composeOwner!!.onStart()
-                composeOwner!!.onResume()
+                composeOwner?.onStart()
+                composeOwner?.onResume()
             }
 
-            windowManager.addView(root, _rootParams)
+            windowManager.addView(root, _layoutParams)
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -97,7 +99,7 @@ constructor(
     fun update() {
         //if (root.windowToken == null) return
         try {
-            windowManager.updateViewLayout(root, _rootParams)
+            windowManager.updateViewLayout(root, _layoutParams)
         } catch (ex: Exception) {
             ex.printStackTrace()
             Log.d(TAG, "update has exception ${ex.message}")
