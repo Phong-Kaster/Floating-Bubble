@@ -42,4 +42,11 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(project(":screenez"))
+
+    /** Compose Runtime - https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.2*/
+    implementation(libs.androidx.runtime)
+
+    /** Compose UI*/
+    runtimeOnly(libs.ui)
+
 }
