@@ -15,7 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.example.floatingbubble.R
+import com.example.floatingbubbleexample.R
 import com.example.jetpack.util.AppUtil
 import com.example.jetpack.util.PermissionUtil
 import javax.inject.Inject
@@ -90,8 +90,8 @@ constructor(
 
         //2. show dialog
         val builder = AlertDialog.Builder(activity)
-        builder.setTitle(activity.getString(R.string.fake_title))
-        builder.setMessage(activity.getString(R.string.fake_message))
+        builder.setTitle(activity.getString(com.example.floatingbubbleexample.R.string.app_name))
+        builder.setMessage(activity.getString(R.string.app_name))
         builder.setPositiveButton(R.string.ok, listener)
         builder.show()
     }

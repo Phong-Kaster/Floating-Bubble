@@ -3,7 +3,7 @@ package com.example.floatingbubble.ui.activity
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.example.floatingbubble.R
+import com.example.floatingbubbleexample.R
 import com.example.jetpack.core.CoreActivity
 import dagger.hilt.android.AndroidEntryPoint
 

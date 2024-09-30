@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Point
 import android.graphics.PointF
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -20,10 +19,10 @@ import com.example.floatingbubble.util.updateGestureExclusion
 import kotlin.math.abs
 
 class FloatingBubble(
-    context: Context,
-    containCompose: Boolean = false,
-    onDispatchKeyEvent: ((KeyEvent) -> Boolean?)? = null,
+    private val context: Context,
     private val forceDragging: Boolean = false,
+    containCompose: Boolean,
+    onDispatchKeyEvent: ((KeyEvent) -> Boolean?)? = null,
     private val triggerClickableAreaPx: Float = 1f,
 ) : Bubble(
     context = context,
@@ -34,95 +33,28 @@ class FloatingBubble(
     },
     containCompose = containCompose
 ) {
-    private val TAG = this.javaClass.simpleName
 
     /**
      * store previous point for later usage, reset after finger down
      * */
-    private val prevPoint = Point(0, 0) // the initial position of the finger when it is pressed
-    private val rawPointOnDown = PointF(0f, 0f) //
+    private val prevPoint = Point(0, 0)
+    private val rawPointOnDown = PointF(0f, 0f)
     private val newPoint = Point(0, 0)
+
     private var halfScreenWidth = sez.fullWidth / 2
 
-
-    private var springAnimation: SpringAnimation? = null
-
     internal var callback: FloatingBubbleCallback? = null
-    internal var enableDrag: Boolean = false
-    private var ignoreClick: Boolean = false
+
+    internal var enableDrag: Boolean = true
 
     init {
         customTouch()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun customTouch() {
-
-        fun handleMovement(event: MotionEvent) {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    prevPoint.x = layoutParams.x
-                    prevPoint.y = layoutParams.y
-
-                    rawPointOnDown.x = event.rawX
-                    rawPointOnDown.y = event.rawY
-
-                    callback?.onFingerDown(event.rawX, event.rawY)
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-                    if (!enableDrag) return
-                    callback?.onFingerMove(event.rawX, event.rawY)
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    callback?.onFingerUp(event.rawX, event.rawY)
-                }
-            }
-        }
-
-
-        fun ignoreChildClickEvent(event: MotionEvent): Boolean {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> ignoreClick = false
-                MotionEvent.ACTION_UP -> ignoreClick = false
-                MotionEvent.ACTION_MOVE -> {
-                    if (abs(event.rawX - rawPointOnDown.x) > triggerClickableAreaPx ||
-                        abs(event.rawY - rawPointOnDown.y) > triggerClickableAreaPx
-                    ) {
-                        ignoreClick = true
-                    }
-                }
-            }
-
-            return ignoreClick
-        }
-
-
-        (root as BubbleLinearLayout).apply {
-            afterMeasured { updateGestureExclusion() }
-
-            if (forceDragging) {
-                // maybe these are the reasons why the compose view stop, really weird. compose view not show in some case
-                doOnTouchEvent = { handleMovement(it) }
-                ignoreChildEvent = { motionEvent -> ignoreChildClickEvent(motionEvent) }
-            } else {
-                this.setOnTouchListener { view, motionEvent ->
-                    handleMovement(motionEvent)
-                    true
-                }
-            }
-        }
-    }
-
-    // spring animation --------------------------------------------------------------------------------
-    fun safeCancelAnimation() {
-        springAnimation?.cancel()
-    }
-
+    private var springAnim: SpringAnimation? = null
     fun animateToEdge() {
-        springAnimation?.cancel()
-        springAnimation = null
+        springAnim?.cancel()
+        springAnim = null
 
         val bubbleWidth = root.width // -1
 
@@ -139,7 +71,7 @@ class FloatingBubble(
             endX = sez.safeWidth - bubbleWidth
         }
 
-        springAnimation = SpringAnimationUtil.startSpringX(
+        springAnim = SpringAnimationUtil.startSpringX(
             startValue = startX.toFloat(),
             finalPosition = endX.toFloat(),
             event = object : SpringAnimationUtil.Event {
@@ -148,36 +80,23 @@ class FloatingBubble(
                         layoutParams.x = float.toInt()
                         update()
                     } catch (e: Exception) {
-                        e.printStackTrace()
-                        Log.d(TAG, "onUpdate with exception ${e.message}")
+//                        Log.e("<>", "onUpdate: ${e.printStackTrace()}")
                     }
                 }
 
                 override fun onEnd() {
-                    springAnimation = null
+                    springAnim = null
                 }
             }
         )
     }
 
-    fun animateTo(x: Float, y: Float, stiffness: Float = SpringForce.STIFFNESS_MEDIUM) {
-        SpringAnimationUtil.animateSpringPath(
-            startX = newPoint.x.toFloat(),
-            startY = newPoint.y.toFloat(),
-            endX = x,
-            endY = y,
-            event = object : SpringAnimationUtil.Event {
-                override fun onUpdatePoint(x: Float, y: Float) {
-                    layoutParams.x = x.toInt()
-                    layoutParams.y = y.toInt()
-                    update()
-                }
-            },
-            stiffness = stiffness,
-        )
+    fun safeCancelAnimation() {
+        springAnim?.cancel()
     }
 
-    // bubble position --------------------------------------------------------------------------------
+    // private func --------------------------------------------------------------------------------
+
     fun updateLocationUI(x: Float, y: Float) {
         val mIconDeltaX = x - rawPointOnDown.x
         val mIconDeltaY = y - rawPointOnDown.y
@@ -217,5 +136,106 @@ class FloatingBubble(
      * */
     fun rawLocationOnScreen(): Pair<Float, Float> {
         return Pair(newPoint.x.toFloat(), newPoint.y.toFloat())
+    }
+
+    /**
+     * pass close bubble point
+     * */
+    fun animateTo(x: Float, y: Float, stiffness: Float = SpringForce.STIFFNESS_MEDIUM) {
+        SpringAnimationUtil.animateSpringPath(
+            startX = newPoint.x.toFloat(),
+            startY = newPoint.y.toFloat(),
+            endX = x,
+            endY = y,
+            event = object : SpringAnimationUtil.Event {
+                override fun onUpdatePoint(x: Float, y: Float) {
+                    layoutParams.x = x.toInt()
+                    layoutParams.y = y.toInt()
+
+//                    builder.listener?.onMove(x.toFloat(), y.toFloat()) // don't call this line, it'll spam multiple MotionEvent.OnActionMove
+                    update()
+                }
+            },
+            stiffness = stiffness,
+        )
+    }
+
+    private var ignoreClick: Boolean = false
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun customTouch() {
+        val MAX_XY_MOVE = triggerClickableAreaPx
+
+//        val smallestWidth = context.resources.configuration.smallestScreenWidthDp
+//        Log.d("<> smallest width", smallestWidth.toString())
+//        MAX_XY_MOVE = smallestWidth / 30f
+//        Log.d("<> MAX XY move", MAX_XY_MOVE.toString())
+
+        fun handleMovement(event: MotionEvent) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    prevPoint.x = layoutParams.x
+                    prevPoint.y = layoutParams.y
+
+                    rawPointOnDown.x = event.rawX
+                    rawPointOnDown.y = event.rawY
+
+                    callback?.onFingerDown(event.rawX, event.rawY)
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    if (enableDrag) {
+                        callback?.onFingerMove(event.rawX, event.rawY)
+                    }
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    callback?.onFingerUp(event.rawX, event.rawY)
+                }
+            }
+        }
+
+
+        fun ignoreChildClickEvent(event: MotionEvent): Boolean {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    ignoreClick = false
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    ignoreClick = false
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    if (abs(event.rawX - rawPointOnDown.x) > MAX_XY_MOVE || abs(event.rawY - rawPointOnDown.y) > MAX_XY_MOVE) {
+                        ignoreClick = true
+                    }
+                }
+            }
+
+            return ignoreClick
+        }
+
+        // listen actions --------------------------------------------------------------------------
+
+        (root as BubbleLinearLayout).apply {
+
+            afterMeasured { updateGestureExclusion() }
+
+            if (forceDragging) {
+                // maybe these are the reasons why the compose view stop, really weird. compose view not show in some case
+                doOnTouchEvent = {
+                    handleMovement(it)
+                }
+                ignoreChildEvent = { motionEvent ->
+                    ignoreChildClickEvent(motionEvent)
+                }
+            } else {
+                this.setOnTouchListener { view, motionEvent ->
+                    handleMovement(motionEvent)
+                    true
+                }
+            }
+        }
     }
 }

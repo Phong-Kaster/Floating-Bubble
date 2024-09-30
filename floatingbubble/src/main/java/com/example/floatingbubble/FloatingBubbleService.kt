@@ -1,5 +1,6 @@
 package com.example.floatingbubble
 
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.PointF
 import android.util.Log
@@ -14,19 +15,25 @@ abstract class FloatingBubbleService : BubbleService() {
 
     /** the current state of floating miniBubble*/
     private var state = BubbleState.NONE
-    private var miniBubble: FloatingBubble? = null
+
+    var miniBubble: FloatingBubble? = null
+        private set
 
     abstract fun setupMiniBubble(): BubbleBuilder?
 
 
     //region public methods
-     var latestX = 0f
-     var latestY = 0f
+    var latestX = 0f
+    var latestY = 0f
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         miniBubble?.remove()
         sez.refresh()
+        createMiniBubble(
+            context = this,
+            miniBubbleBuilder = setupMiniBubble(),
+        )
         when (state) {
             BubbleState.MINI_BUBBLE -> minimize()
             BubbleState.EXPANDED_BUBBLE -> expand()
@@ -38,12 +45,21 @@ abstract class FloatingBubbleService : BubbleService() {
      * get ready for users configuration
      */
     override fun setupBubble() {
-        createMiniBubble()
+        Log.d(TAG, "setupBubble")
+        createMiniBubble(
+            context = this,
+            miniBubbleBuilder = setupMiniBubble()
+        )
     }
 
-    private fun createMiniBubble() {
-        val miniBubbleBuilder: BubbleBuilder? = setupMiniBubble()
+    private fun createMiniBubble(
+        context: Context,
+        miniBubbleBuilder: BubbleBuilder?,
+    ) {
+        Log.d(TAG, "createMiniBubble")
+        //val miniBubbleBuilder: BubbleBuilder? = setupMiniBubble()
 
+        Log.d(TAG, "createMiniBubble - miniBubbleBuilder = ${miniBubbleBuilder == null} ")
         if (miniBubbleBuilder == null) {
             Log.d(TAG, "miniBubbleBuilder is null !")
             return
@@ -51,10 +67,11 @@ abstract class FloatingBubbleService : BubbleService() {
 
         // setup miniBubble ------------------------------------------------------------------------
         miniBubble = FloatingBubble(
-            context = this@FloatingBubbleService,
+            context = context,
             forceDragging = miniBubbleBuilder.forceDragging,
             containCompose = miniBubbleBuilder.bubbleCompose != null,
-            triggerClickableAreaPx = miniBubbleBuilder.triggerClickablePerimeterPx
+            triggerClickableAreaPx = miniBubbleBuilder.triggerClickablePerimeterPx,
+            onDispatchKeyEvent = null
         )
 
         if (miniBubbleBuilder.bubbleView != null) {
@@ -109,7 +126,13 @@ abstract class FloatingBubbleService : BubbleService() {
 
     fun minimize() {
         state = BubbleState.MINI_BUBBLE
-        miniBubble?.show()
+        try {
+            miniBubble?.show()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            Log.d(TAG, "minimize has exception ${ex.message}")
+        }
+
     }
 
     private inner class CustomBubbleListener(
@@ -118,7 +141,7 @@ abstract class FloatingBubbleService : BubbleService() {
         private val closeBehavior: CloseBubbleBehavior = CloseBubbleBehavior.FIXED_CLOSE_BUBBLE,
         private val isCloseBubbleEnabled: Boolean = true,
         private val triggerClickableAreaPx: Float = 1f
-    ): FloatingBubbleCallback {
+    ) : FloatingBubbleCallback {
 
         private var isCloseBubbleVisible = false
         private var onDownLocation = PointF(0f, 0f)

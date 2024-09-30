@@ -3,7 +3,7 @@ agp = "8.5.2"
 hiltAndroid = "2.52"
 hiltAndroidCompiler = "2.51.1"
 hiltNavigationFragment = "1.2.0"
-kotlin = "1.9.0"
+kotlin = "2.0.20"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -56,4 +56,5 @@ androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", vers
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+#Add the Compose Compiler Gradle plugin, the version matches the Kotlin plugin
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

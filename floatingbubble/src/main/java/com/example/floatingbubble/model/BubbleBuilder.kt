@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
@@ -21,6 +22,7 @@ class BubbleBuilder(
     private val context: Context
 ) {
 
+    private val TAG  = this.javaClass.simpleName
     // bubble
     internal var bubbleView: View? = null
     internal var bubbleCompose: ComposeView? = null
@@ -39,7 +41,7 @@ class BubbleBuilder(
     internal var closeBubbleBottomPaddingPx = 80
     internal var triggerClickablePerimeterPx = 5f
 
-    internal var listener: FloatingBubbleCallback? = null
+//    internal var listener: FloatingBubbleCallback? = null
     internal var behavior: CloseBubbleBehavior = CloseBubbleBehavior.FIXED_CLOSE_BUBBLE
 
     internal var forceDragging: Boolean = true
@@ -132,7 +134,7 @@ class BubbleBuilder(
         return this
     }
 
-    @Discouraged("when using bubbleCompose, you should set `forceDragging` to false. otherwise the bubbleCompose may not works correctly in some cases")
+    //@Discouraged("when using bubbleCompose, you should set `forceDragging` to false. otherwise the bubbleCompose may not works correctly in some cases")
     fun bubbleCompose(content: @Composable () -> Unit): BubbleBuilder {
         this.bubbleCompose = ComposeView(context).apply {
             setContent(content)
@@ -174,29 +176,29 @@ class BubbleBuilder(
      * add a listener, pass an instance of FloatingBubble.Action
      * @param FloatingBubble.Listener
      * */
-    fun addFloatingBubbleListener(listener: FloatingBubbleCallback): BubbleBuilder {
-
-        val tempListener = this.listener
-        this.listener = object : FloatingBubbleCallback {
-
-            override fun onFingerDown(x: Float, y: Float) {
-                tempListener?.onFingerDown(x, y)
-                listener.onFingerDown(x, y)
-            }
-
-            override fun onFingerMove(x: Float, y: Float) {
-                tempListener?.onFingerMove(x, y)
-                listener.onFingerMove(x, y)
-            }
-
-            override fun onFingerUp(x: Float, y: Float) {
-                tempListener?.onFingerUp(x, y)
-                listener.onFingerUp(x, y)
-            }
-
-        }
-        return this
-    }
+//    fun addFloatingBubbleListener(listener: FloatingBubbleCallback): BubbleBuilder {
+//
+//        val tempListener = this.listener
+//        this.listener = object : FloatingBubbleCallback {
+//
+//            override fun onFingerDown(x: Float, y: Float) {
+//                tempListener?.onFingerDown(x, y)
+//                listener.onFingerDown(x, y)
+//            }
+//
+//            override fun onFingerMove(x: Float, y: Float) {
+//                tempListener?.onFingerMove(x, y)
+//                listener.onFingerMove(x, y)
+//            }
+//
+//            override fun onFingerUp(x: Float, y: Float) {
+//                tempListener?.onFingerUp(x, y)
+//                listener.onFingerUp(x, y)
+//            }
+//
+//        }
+//        return this
+//    }
 
     /**
      * examples: x=0, y=0 show the bubble on the top-left corner of the screen.

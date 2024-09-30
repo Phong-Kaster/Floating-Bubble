@@ -21,10 +21,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.floatingbubble.R
+
 import com.example.floatingbubble.ui.theme.ColorTextHelp
 import com.example.floatingbubble.ui.theme.customizedTextStyle
 import com.example.floatingbubble.ui.theme.outerShadow
+import com.example.floatingbubbleexample.R
 
 @Composable
 fun FloatingIcon(

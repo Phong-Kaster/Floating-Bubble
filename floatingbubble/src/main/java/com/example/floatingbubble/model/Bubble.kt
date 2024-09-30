@@ -8,70 +8,64 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import com.example.floatingbubble.ui.ComposeLifecycleOwner
 
-open class Bubble
-constructor(
+open class Bubble(
     context: Context,
     root: View?,
     private val containCompose: Boolean = false
 ) {
     private val TAG = this.javaClass.simpleName
-
-    /* Window Manager */
     private var _windowManager: WindowManager? = null
-    private val windowManager: WindowManager
-        get() = _windowManager!!
+    private var _rootParams: WindowManager.LayoutParams? = null
 
+    val windowManager get() = _windowManager!!
 
-    /* Params */
-    private var _layoutParams: WindowManager.LayoutParams
-    var layoutParams
-        get() = _layoutParams
-        set(value) {
-            _layoutParams = value
-        }
+    private var composeOwner: ComposeLifecycleOwner? = null
+    private var isComposeOwnerInitialized: Boolean = false
 
-    /*  Root View */
     private var _root: View? = null
     var root
         get() = _root!!
         set(value) {
             _root = value
         }
-    val rootGroup: ViewGroup
-        get() = root as ViewGroup
 
-    /* Compose-based UI*/
-    private var composeOwner: ComposeLifecycleOwner? = null
-    private var isComposeOwnerInitialized: Boolean = false
+    var layoutParams
+        get() = _rootParams!!
+        set(value) {
+            _rootParams = value
+        }
+
+    val rootGroup get() = root as ViewGroup
 
     init {
         _windowManager = context.getSystemService(Service.WINDOW_SERVICE) as WindowManager
-        _layoutParams = WindowManager.LayoutParams()
+        _rootParams = WindowManager.LayoutParams()
         _root = root
 
         if (containCompose) {
+            Log.d(TAG, "containCompose = $containCompose")
             composeOwner = ComposeLifecycleOwner()
-            composeOwner?.attachToDecorView(root)
+            composeOwner!!.attachToDecorView(root)
         }
     }
 
+    // public --------------------------------------------------------------------------------------
 
     open fun show() {
         try {
             if (containCompose) {
-
                 if (isComposeOwnerInitialized.not()) {
                     composeOwner!!.onCreate() // only call this once
                     isComposeOwnerInitialized = true
 
                 }
-                composeOwner?.onStart()
-                composeOwner?.onResume()
+                composeOwner!!.onStart()
+                composeOwner!!.onResume()
             }
 
-            windowManager.addView(root, _layoutParams)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
+            windowManager.addView(root, _rootParams)
+        } catch (e: Exception) {
+//            e.printStackTrace() // xxx has already added to WindowManager
         }
     }
 
@@ -81,28 +75,25 @@ constructor(
      * - add this line 'if (root.windowToken == null) return' will prevent the view from being removed in some cases
      * */
     open fun remove() {
-        //if (root.windowToken == null) return
+//        if (root.windowToken == null) return
         try {
             windowManager.removeView(root)
 
             if (containCompose) {
-                composeOwner?.onPause()
-                composeOwner?.onStop()
-                composeOwner?.onDestroy()
+                composeOwner!!.onPause()
+                composeOwner!!.onStop()
+                composeOwner!!.onDestroy()
             }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            Log.d(TAG, "remove has exception ${ex.message}")
-        }
+        }catch (_: Exception){}
     }
 
     fun update() {
-        //if (root.windowToken == null) return
+//        if (root.windowToken == null) return
         try {
-            windowManager.updateViewLayout(root, _layoutParams)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            Log.d(TAG, "update has exception ${ex.message}")
+            windowManager.updateViewLayout(root, _rootParams)
+        }catch (e: Exception){
+            e.printStackTrace()
         }
     }
+
 }

@@ -3,10 +3,15 @@ package com.example.floatingbubble.ui.fragment.home
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,13 +28,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.KeyEventDispatcher
 import com.example.floatingbubble.R
+import com.example.floatingbubble.enums.CloseBubbleBehavior
 import com.example.floatingbubble.lifecycleobserver.NotificationLifecycleObserver
+import com.example.floatingbubble.model.BubbleBuilder
 import com.example.floatingbubble.service.FacebookBubbleService
-import com.example.floatingbubble.service.MyFloatingBubbleService
+import com.example.floatingbubble.ui.fragment.bubble.BubbleCompose
 import com.example.floatingbubble.ui.theme.ColorBackground
 import com.example.floatingbubble.ui.theme.customizedTextStyle
 import com.example.floatingbubble.util.ServiceUtil.startBubbleService
+import com.example.floatingbubble.util.ViewHelper
 import com.example.jetpack.core.CoreFragment
 import com.example.jetpack.core.CoreLayout
 import com.example.jetpack.util.PermissionUtil
@@ -41,12 +50,15 @@ class HomeFragment : CoreFragment() {
 
     private lateinit var notificationLifecycleObserver: NotificationLifecycleObserver
 
+    private val windowManager by lazy { requireActivity().getSystemService(Context.WINDOW_SERVICE) as WindowManager }
+
     @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupNotificationLauncher()
         setupNotification()
+        setupCloneBubble()
     }
 
     /*************************************************
@@ -79,6 +91,37 @@ class HomeFragment : CoreFragment() {
         // 3. Create lockscreen-styled notification and send it every day
         //LockscreenManager.createNotificationChannel(context = requireContext())
         //LockscreenManager.sendNotification(context = requireContext())
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun setupCloneBubble(){
+        val display = windowManager.defaultDisplay
+        val screenSize = Point()
+        display.getSize(screenSize)
+
+        val imgView = ViewHelper.fromDrawable(requireContext(), R.drawable.ic_disclaimer, 40, 40)
+        imgView.setOnClickListener {
+            KeyEventDispatcher.dispatchBeforeHierarchy(
+                imgView,
+                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK)
+            )
+        }
+
+        val clone = BubbleBuilder(requireActivity())
+            //.bubbleView(imgView)
+            .bubbleCompose { BubbleCompose() }
+            .forceDragging(false)
+            .bubbleStyle(null)
+            .startLocation((screenSize.x * 0F).toInt(), (screenSize.y * 0.5).toInt())    // in dp
+            .startLocationPx((screenSize.x * 0F).toInt(), (screenSize.y * 0.5).toInt())  // in px
+            .enableAnimateToEdge(true)
+            .closeBubbleView(ViewHelper.fromDrawable(requireContext(), R.drawable.ic_close_bubble, 60, 60))
+            .closeBubbleStyle(null)
+            .closeBehavior(CloseBubbleBehavior.DYNAMIC_CLOSE_BUBBLE)
+            .distanceToClose(100)
+            .bottomBackground(true)
+
+        Log.d("HomeFragment", "setupMiniBubble - clone = ${clone}")
     }
 
     @Composable

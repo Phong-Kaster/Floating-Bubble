@@ -4,10 +4,11 @@ plugins {
     id("androidx.navigation.safeargs")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace = "com.example.floatingbubble"
+    namespace = "com.example.floatingbubbleexample"
     compileSdk = 34
 
     defaultConfig {
@@ -40,11 +41,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        compose = true
         dataBinding = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {

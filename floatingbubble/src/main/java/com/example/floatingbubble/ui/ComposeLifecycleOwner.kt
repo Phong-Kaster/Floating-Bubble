@@ -27,23 +27,14 @@ import kotlin.coroutines.CoroutineContext
  */
 internal class ComposeLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOwner {
 
-    private val TAG = this.javaClass.simpleName
-    private var _view: View? = null // A nullable View property used to hold a reference to the view.
-    private var recomposer: Recomposer? = null// A nullable Recomposer property used to manage recomposition.
-    private var recompositionScope: CoroutineScope? = null // A nullable CoroutineScope property used to manage coroutines for recomposition.
-    private var coroutineContext: CoroutineContext? = null // A nullable CoroutineContext property used to define the context for coroutines.
-
-    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
-    override val lifecycle: Lifecycle get() = lifecycleRegistry
-
-    private val savedStateRegistryController = SavedStateRegistryController.create(this)
-    override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
-
-    private val store = ViewModelStore()
-    override val viewModelStore: ViewModelStore get() = store
+    private var _view: View? = null
+    private var recomposer: Recomposer? = null
+    private var runRecomposeScope: CoroutineScope? = null
+    private var coroutineContext: CoroutineContext? = null
 
     init {
         coroutineContext = AndroidUiDispatcher.CurrentThread
+
     }
 
     fun onCreate() {
@@ -51,15 +42,17 @@ internal class ComposeLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOw
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
 
-        recompositionScope?.cancel()
-        recompositionScope = CoroutineScope(coroutineContext!!)
+        runRecomposeScope?.cancel()
 
+        runRecomposeScope = CoroutineScope(coroutineContext!!)
         recomposer = Recomposer(coroutineContext!!)
         _view?.compositionContext = recomposer
 
-        recompositionScope!!.launch {
+        runRecomposeScope!!.launch {
             recomposer!!.runRecomposeAndApplyChanges()
         }
+
+
     }
 
     fun onStart() {
@@ -72,8 +65,7 @@ internal class ComposeLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOw
              *
              * try catch then the issue fixed, somehow... =)))
              * */
-            e.printStackTrace()
-            Log.d(TAG, "onStart with exception ${e.message}")
+//            e.printStackTrace()
         }
     }
 
@@ -87,6 +79,7 @@ internal class ComposeLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOw
 
     fun onStop() {
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+
     }
 
     fun onDestroy() {
@@ -96,12 +89,6 @@ internal class ComposeLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOw
     }
 
     /**
-     * attachToDecorView do two works:
-     *
-     * Attaches the ComposeLifecycleOwner to the provided view
-     *
-     * Sets the ViewTreeLifecycleOwner, ViewTreeViewModelStoreOwner, and ViewTreeSavedStateRegistryOwner for the view.
-     *
      * Compose uses the Window's decor view to locate the
      * Lifecycle/ViewModel/SavedStateRegistry owners.
      * Therefore, we need to set this class as the "owner" for the decor view.
@@ -111,8 +98,21 @@ internal class ComposeLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOw
 
         _view = view
 
+//        ViewTreeLifecycleOwner.set(view, this)
         view.setViewTreeLifecycleOwner(this)
         view.setViewTreeViewModelStoreOwner(this)
         view.setViewTreeSavedStateRegistryOwner(this)
+
     }
+
+    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+    override val lifecycle: Lifecycle get() = lifecycleRegistry
+//    override fun getLifecycle(): Lifecycle = lifecycleRegistry
+
+    private val savedStateRegistryController = SavedStateRegistryController.create(this)
+    override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
+
+
+    private val store = ViewModelStore()
+    override val viewModelStore: ViewModelStore get() = store
 }

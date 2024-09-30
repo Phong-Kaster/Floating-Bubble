@@ -3,15 +3,14 @@ package com.example.floatingbubble.service
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Point
-import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.core.view.KeyEventDispatcher
-import com.example.floatingbubble.FloatingBubbleCallback
 import com.example.floatingbubble.FloatingBubbleService
 import com.example.floatingbubble.R
 import com.example.floatingbubble.enums.CloseBubbleBehavior
 import com.example.floatingbubble.model.BubbleBuilder
+import com.example.floatingbubble.ui.fragment.bubble.BubbleCompose
 import com.example.floatingbubble.util.ViewHelper
 
 
@@ -36,45 +35,24 @@ class FacebookBubbleService : FloatingBubbleService() {
         val display = windowManager.defaultDisplay
         val screenSize = Point()
         display.getSize(screenSize)
-        val listener = object : FloatingBubbleCallback {
-            override fun onFingerMove(
-                x: Float,
-                y: Float
-            ) {
-                Log.d(TAG, "onFingerMove - x = $x, y = $y")
-            } // The location of the finger on the screen which triggers the movement of the bubble.
 
 
-            override fun onFingerUp(
-                x: Float,
-                y: Float
-            ) {
-                Log.d(TAG, "onFingerUp - x = $x, y = $y")
-            }   // ..., when finger release from bubble
 
-
-            override fun onFingerDown(x: Float, y: Float) {
-                Log.d(TAG, "onFingerDown - x = $x, y = $y")
-            } // ..., when finger tap the bubble
-        }
-
-        return BubbleBuilder(this)
+        return BubbleBuilder(this@FacebookBubbleService)
             // set bubble view
-            .bubbleView(imgView)
+            //.bubbleView(imgView)
             .triggerClickablePerimeterPx(5f)
 
             // or our sweetie, Jetpack Compose
-//            .bubbleCompose {
-//                BubbleCompose(expand = { expand() })
-//            }
-//            .forceDragging(false)
+            .bubbleCompose { BubbleCompose() }
+            .forceDragging(false)
 
             // set style for the bubble, fade animation by default
             .bubbleStyle(null)
 
             // set start location for the bubble, (x=0, y=0) is the top-left
-            .startLocation((screenSize.x * 0F).toInt(), (screenSize.y * 0.5).toInt())    // in dp
-            .startLocationPx((screenSize.x * 0F).toInt(), (screenSize.y * 0.5).toInt())  // in px
+            .startLocation((screenSize.x * 0F).toInt(), (screenSize.y * 0.3).toInt())    // in dp
+            .startLocationPx((screenSize.x * 0F).toInt(), (screenSize.y * 0.3).toInt())  // in px
 
 
             // enable auto animate bubble to the left/right side when release, true by default
@@ -95,8 +73,6 @@ class FacebookBubbleService : FloatingBubbleService() {
 
             // enable bottom background, false by default
             .bottomBackground(true)
-
-            .addFloatingBubbleListener(listener)
     }
 
 }

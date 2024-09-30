@@ -9,12 +9,10 @@ import android.graphics.Point
 import android.os.IBinder
 import android.util.Log
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-import com.example.floatingbubble.R
 
 
 class MyFloatingBubbleService : Service() {
@@ -24,7 +22,7 @@ class MyFloatingBubbleService : Service() {
 
 
     /** Inflater floating bubble layout */
-    private val floatingBubbleLayout: View by lazy { LayoutInflater.from(this).inflate(R.layout.layout_floating_bubble, null) }
+    //private val floatingBubbleLayout: View by lazy { LayoutInflater.from(this).inflate(R.layout.layout_floating_bubble, null) }
     private val layoutParams: WindowManager.LayoutParams = WindowManager.LayoutParams(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
@@ -44,7 +42,7 @@ class MyFloatingBubbleService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        windowManager.removeViewImmediate(floatingBubbleLayout)
+        //windowManager.removeViewImmediate(floatingBubbleLayout)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -58,7 +56,7 @@ class MyFloatingBubbleService : Service() {
         layoutParams.x = screenSize.x
         layoutParams.y = (screenSize.y * 0.5).toInt()
 
-        windowManager.addView(floatingBubbleLayout, layoutParams)
+       // windowManager.addView(floatingBubbleLayout, layoutParams)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -93,7 +91,7 @@ class MyFloatingBubbleService : Service() {
                         layoutParams.y = initialY + (motionEvent.rawY - initialTouchY).toInt()
 
                         //Update the layout with new X & Y coordinate
-                        windowManager.updateViewLayout(floatingBubbleLayout, layoutParams)
+                        //windowManager.updateViewLayout(floatingBubbleLayout, layoutParams)
                         return true
                     }
 
@@ -102,7 +100,7 @@ class MyFloatingBubbleService : Service() {
             }
         }
         try {
-            floatingBubbleLayout.setOnTouchListener(listener)
+            //floatingBubbleLayout.setOnTouchListener(listener)
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
