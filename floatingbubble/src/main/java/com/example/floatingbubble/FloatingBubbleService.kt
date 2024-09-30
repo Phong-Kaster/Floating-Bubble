@@ -1,6 +1,5 @@
 package com.example.floatingbubble
 
-import android.content.Context
 import android.content.res.Configuration
 import android.graphics.PointF
 import android.util.Log
@@ -30,10 +29,7 @@ abstract class FloatingBubbleService : BubbleService() {
         super.onConfigurationChanged(newConfig)
         miniBubble?.remove()
         sez.refresh()
-        createMiniBubble(
-            context = this,
-            miniBubbleBuilder = setupMiniBubble(),
-        )
+        createMiniBubble()
         when (state) {
             BubbleState.MINI_BUBBLE -> minimize()
             BubbleState.EXPANDED_BUBBLE -> expand()
@@ -46,18 +42,13 @@ abstract class FloatingBubbleService : BubbleService() {
      */
     override fun setupBubble() {
         Log.d(TAG, "setupBubble")
-        createMiniBubble(
-            context = this,
-            miniBubbleBuilder = setupMiniBubble()
-        )
+        createMiniBubble()
     }
 
-    private fun createMiniBubble(
-        context: Context,
-        miniBubbleBuilder: BubbleBuilder?,
-    ) {
+    private fun createMiniBubble() {
         Log.d(TAG, "createMiniBubble")
-        //val miniBubbleBuilder: BubbleBuilder? = setupMiniBubble()
+        val miniBubbleBuilder: BubbleBuilder? = setupMiniBubble()
+
 
         Log.d(TAG, "createMiniBubble - miniBubbleBuilder = ${miniBubbleBuilder == null} ")
         if (miniBubbleBuilder == null) {
@@ -67,7 +58,7 @@ abstract class FloatingBubbleService : BubbleService() {
 
         // setup miniBubble ------------------------------------------------------------------------
         miniBubble = FloatingBubble(
-            context = context,
+            context = this,
             forceDragging = miniBubbleBuilder.forceDragging,
             containCompose = miniBubbleBuilder.bubbleCompose != null,
             triggerClickableAreaPx = miniBubbleBuilder.triggerClickablePerimeterPx,
@@ -121,7 +112,13 @@ abstract class FloatingBubbleService : BubbleService() {
 
     fun expand() {
         state = BubbleState.EXPANDED_BUBBLE
-        miniBubble?.remove()
+        try {
+            miniBubble?.remove()
+        }catch (ex: Exception) {
+            ex.printStackTrace()
+            Log.d(TAG, "expand with exception ${ex.message}")
+        }
+
     }
 
     fun minimize() {

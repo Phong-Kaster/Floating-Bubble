@@ -45,7 +45,7 @@ class FacebookBubbleService : FloatingBubbleService() {
 
             // or our sweetie, Jetpack Compose
             .bubbleCompose { BubbleCompose() }
-            .forceDragging(false)
+            .forceDragging(true)
 
             // set style for the bubble, fade animation by default
             .bubbleStyle(null)
